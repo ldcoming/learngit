@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<!-- 在页面中，放一个文本框，点击开始按钮，在文本框中显示当前系统时间，如果想停止，可以点击停止按钮，文本内容停止走动 -->
+<head>
+	<meta charset="utf-8">
+	<title>index</title>
+</head>
+	<style type="text/css">
+		*{
+			font-family: 微软雅黑;
+		}
+			
+	</style>
+	<script type="text/javascript">
+		window.onload=function(){
+			selectEle1 = document.getElementById('s1');	
+			selectEle2 = document.getElementById('s2');	
+			provinces = ['请选择省份','安徽','江苏','上海','北京','浙江'];
+			ctiy = [
+				[],
+				['安庆', '铜陵', '马鞍山', '芜湖'],
+				['南京', '苏州', '无锡', '昆山', '徐州'],
+				['徐汇区', '松江区', '嘉定区', '普陀区', '长宁区'],
+				['三里屯', '朝阳区', '海淀区'],
+				['嘉兴','湖州','海宁','杭州']
+			];
+			for(i in provinces){
+				opt = new Option(provinces[i], provinces[i]);
+				selectEle1.options.add(opt);
+			}
+			selectEle1.onchange=function(){
+				index = selectEle1.selectedIndex;
+				selectEle2.options.length=0;
+				value = ctiy[index];
+				for(i in value){
+					opt = new Option(value[i],value[i]);
+					selectEle2.options.add(opt);
+				}
+			}
+		};	
+	</script>
+<body>
+	<select id='s1'></select>	
+	<select id='s2'></select>	
+</body>
+</html>
