@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>snake</title>
+	<style type="text/css">
+		*{
+			font-family: 微软雅黑; 
+		}
+		
+	</style>
+	<script type='text/javascript'>
+		/*
+			贪食蛇程序
+		*/
+		var map;		//声明地图对象
+		var snake;		//声明蛇对象
+		var food;		//声明食物对象
+		var timer;		//声明定时器对象
+
+		//定义地图类
+		function Map(){
+			this.width=600;  			//地图的宽度
+			this.height=400;			//地图的高度
+			this.color='#ccc';			//地图的背景颜色
+			this.position='absolute';	//地图的定位方式
+
+			//show方法将地图放入body中去
+			this.show=function(){
+				var divEle=document.createElement('div');		//创建一个div元素结点		
+				this.div=divEle;
+				divEle.style.width=this.width+'px';
+				divEle.style.height=this.height+'px';
+				divEle.style.backgroundColor=this.color;
+				divEle.style.position=this.position;
+				document.body.appendChild(divEle);
+				// divEle.style.top='80px';
+				// divEle.style.left='150px';		
+			};
+		};
+
+		//定义食物类
+		function Food(){
+			this.width=20;				//定义食物宽度
+			this.height=20;				//定义食物高度
+			this.color='green';			//定义食物颜色
+			this.position='absolute';	//定义食物定位方式
+			this.radius=7;
+			this.one=null;
+
+			//show方法将食物放置到地图中，所有要得到地图对象(所有应该是全局的)
+			this.show=function(){
+
+				//给食物在地图中一个坐标
+				this.x=Math.floor((Math.random()*30));
+				this.y=Math.floor(Math.random()*20);
+				if(this.one==null){
+					var divEle = document.createElement('div'); 	//创建div元素结点
+					this.one=divEle;
+					/*设置食物的样式*/
+					divEle.style.width=this.width+'px';
+					divEle.style.height=this.height+'px';
+					divEle.style.backgroundColor=this.color;
+					divEle.style.borderRadius=this.radius+'px';
+					divEle.style.position=this.position;
+					map.div.appendChild(divEle);
+				}
+
+				this.one.style.top=this.y*20+'px';	
+				this.one.style.left=this.x*20+'px';
+			};
+		};
+
+		//定义贪食蛇类
+		function Snake(){
+			this.position='absolute';	//设置蛇的定位方式
+			this.width=20;				//设置每一蛇节的宽度
+			this.height=20;				//设置每一节蛇的高度
+			this.radius=7;
+			this.direction=39;
+
+			/*body代表蛇,是一个二维数组，首元素代表蛇头,第二维代表x，
+			y坐标和颜色  最后一个存放每个蛇节的div结点，确保每个div只创建一次*/
+			this.body=[
+				[3,3,'red',null],
+				[2,3,'blue',null],
+				[1,3,'blue',null]
+			];
+
+			//将蛇显示到地图中
+			this.show=function(){
+				for(var i=0; i<this.body.length; i++){
+					//如果这个蛇节的div还没有创建,就先创建div结点
+					if(this.body[i][3]==null){
+						this.body[i][3] = document.createElement('div');
+						this.body[i][3].style.width=this.width+'px';
+						this.body[i][3].style.height=this.height+'px';
+						this.body[i][3].style.borderRadius=this.radius+'px';
+						this.body[i][3].style.position=this.position;
+						this.body[i][3].style.backgroundColor=this.body[i][2];
+						map.div.appendChild(this.body[i][3]);
+					}
+
+					//设置蛇的位置
+					this.body[i][3].style.left=this.body[i][0]*20+'px';
+					this.body[i][3].style.top=this.body[i][1]*20+'px';	
+				}
+			};
+
+			/*蛇的移动方法,从后向前移动div是合理的,蛇的移动分两部分：
+				蛇身：后面的div占据前面的div的位置即可
+				蛇头: 蛇头需要根据方向来确定移动的位置	this.body[0]
+			*/
+			this.move=function(){
+
+				document.onkeyup=function(event){
+					snake.setDirection(event.keyCode);
+				}
+				timer = setInterval(function(){
+					//循环移动蛇身的位置,后一个div占领前面的div即可
+					for(var i=snake.body.length-1; i>0; i--){
+						snake.body[i][0]=snake.body[i-1][0];
+						snake.body[i][1]=snake.body[i-1][1];
+					}
+					//根据方向移动蛇头
+					switch(snake.direction){
+						case 37:
+							snake.body[0][0]-=1;
+						break;
+
+						case 38:
+							snake.body[0][1]-=1;
+						break;
+
+						case 39:
+							snake.body[0][0]+=1;
+						break;
+
+						case 40:
+							snake.body[0][1]+=1;
+						break;
+					}
+					if(snake.dead()){
+						clearInterval(timer);
+						return;
+					};
+					snake.grow();
+					snake.show();
+				},150);
+			}
+
+			//设置移动方向
+			this.setDirection=function(code){
+				dir = this.direction;
+				switch(code){
+					case 37:
+						if(dir!= 39){
+							this.direction=37;
+						}
+					break;
+
+					case 38:
+						if(dir!=40){
+							this.direction=38;
+						}
+					break;
+
+					case 39:
+						if(dir!=37){
+							this.direction=39;
+						}
+					break;
+
+					case 40:
+						if(dir!=38){
+							this.direction=40;
+						}
+					break;
+				}
+			}
+
+			//贪食蛇的生长
+			this.grow=function(){
+				if(this.body[0][0]==food.x && this.body[0][1]==food.y){
+					len = this.body.length-1;
+					this.body.push([this.body[len][0],this.body[len][1],'blue',null]);
+					food.show();
+				}
+			}
+
+			//撞墙死
+			this.dead=function(){
+				//撞墙死
+				var result=false;
+				if(this.body[0][0]==-1 || this.body[0][0]==30 || this.body[0][1]==-1 || this.body[0][1]==20){
+					result=true;
+				}else{
+					for(var i=1; i<this.body.length; i++){
+						if(this.body[0][0]==this.body[i][0] && this.body[0][1]==this.body[i][1]){
+							result = true;
+						}
+					}
+				}
+				return result;
+			}
+		};
+
+
+		window.onload=function(){
+			map = new Map();		//创建地图
+			map.show(); 			//将地图放入body中
+
+			food = new Food();	//创建食物
+			food.show();			//将食物显示在地图中
+
+			snake = new Snake();
+			snake.show();
+			snake.move();
+		};
+	</script>
+</head>
+<body>
+	
+</body>
+</html>
