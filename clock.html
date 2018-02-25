@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>index</title>
+</head>
+	<style type="text/css">
+		*{
+			font-family: 微软雅黑;
+		}
+		.div1{
+			width:300px;
+			height:100px;
+			background-color:#272822;
+			border-radius:20px;
+			position: absolute;
+			top:50%;
+			left:50%;
+			margin-top:-50px;
+			margin-left:-150px;
+			color:#0f0;
+			font-size:50px;
+			line-height:100px;
+			text-align:center;
+		}
+	</style>
+<body>
+	<div class="div1">
+		<span id='clock'>18:07:56</span>
+	</div>	
+</body>
+<script type="text/javascript">
+	function checkTime(t){
+		if(t<10){
+			time='0'+t;
+			return time;
+		}
+		return t;
+	}
+	clockEle = document.getElementById('clock');
+	
+	// year = dateObj.getFullYear();  //得到year
+	// month = dateObj.getMonth()+1;  //得到month
+	// day = dateObj.getDate();       //得到day
+
+	function setTime(){
+		dateObj = new Date();	//得到当前日期对象
+		hour = dateObj.getHours();  //得到小时
+		minute = dateObj.getMinutes();  //得到分钟
+		second = dateObj.getSeconds();  //得到秒钟
+		//将小于10的时间前面加上'0'
+		hour = checkTime(hour);
+		minute = checkTime(minute);
+		second = checkTime(second);
+		//将时间写入控件中
+		clockEle.innerHTML=hour+":"+minute+":"+second;
+	}
+	setTime();
+	setInterval(function(){
+		setTime();
+	},1000);
+</script>
+</html>
